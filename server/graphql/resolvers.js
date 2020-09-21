@@ -69,10 +69,9 @@ module.exports = {
           };
         } else {
           errors.username = "password is incorect";
-          throw new AuthenticationError("password is incorect", { errors });
+          throw new UserInputError("password is incorect", { errors });
         }
       } catch (err) {
-        console.log(err);
         throw err;
       }
     },
@@ -84,19 +83,15 @@ module.exports = {
       try {
         if (email.trim() === "") {
           errors.email = "email must not be empty";
-          throw errors;
         }
         if (username.trim() === "") {
           errors.username = "username must not be empty";
-          throw errors;
         }
         if (password.trim() === "") {
           errors.password = "password must not be empty";
-          throw errors;
         }
         if (confirmPassword.trim() === "") {
           errors.confirmPassword = "repeat password must not be empty";
-          throw errors;
         }
 
         if (password !== confirmPassword) {
