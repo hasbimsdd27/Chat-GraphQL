@@ -33,7 +33,7 @@ export default (props) => {
 
   const [errors, setErrors] = useState({});
 
-  const [registerUser, { loading, data, error }] = useMutation(REGISTER_USER, {
+  const [registerUser, { loading }] = useMutation(REGISTER_USER, {
     update: (_, __) => props.history.push("/login"),
     onError: (err) => setErrors(err.graphQLErrors[0].extensions.errors),
   });

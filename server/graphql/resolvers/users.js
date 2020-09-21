@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User } = require("../../models");
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
@@ -6,25 +6,12 @@ const { Op } = require("sequelize");
 
 module.exports = {
   Query: {
-    getUsers: async (_, __, context) => {
+    getUsers: async (_, __, { user }) => {
       try {
-        let user;
-        if (context.req && context.req.headers.authorization) {
-          const token = context.req.headers.authorization.replace(
-            "Bearer ",
-            ""
-          );
-          jwt.verify(
-            token,
-            process.env.JWT_SECRET_ACCESS,
-            (err, decodedToken) => {
-              if (err) {
-                throw new AuthenticationError("Unauthenticated");
-              }
-              user = decodedToken;
-            }
-          );
+        if (!user) {
+          throw new AuthenticationError("Unauthenticated");
         }
+
         const users = await User.findAll({
           where: { username: { [Op.ne]: user.username } },
         });
