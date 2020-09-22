@@ -34,7 +34,6 @@ export default function Users() {
   if (error) {
     console.log(error);
   }
-  console.log(selectedUser);
 
   let usersMarkup;
   if (!data || loading) {
@@ -47,21 +46,25 @@ export default function Users() {
       return (
         <div
           role="button"
-          className={classNames("user-div d-flex p-3", {
-            "bg-white": selected,
-          })}
+          className={classNames(
+            "user-div d-flex justify-content-center justify-content-md-start p-3",
+            {
+              "bg-white": selected,
+            }
+          )}
           key={item.username}
           onClick={() =>
             dispatch({ type: "SET_SELECTED_USER", payload: item.username })
           }
         >
           <Image
-            src={item.imageUrl}
-            roundedCircle
-            className="mr-2"
-            style={{ width: 50, height: 50, objectFit: "cover" }}
+            src={
+              item.imageUrl ??
+              "https://i1.wp.com/static.teamtreehouse.com/assets/content/default_avatar-ea7cf6abde4eec089a4e03cc925d0e893e428b2b6971b12405a9b118c837eaa2.png?ssl=1"
+            }
+            className="user-image "
           />
-          <div>
+          <div className="d-none d-md-block ml-2">
             <p className="text-success m-0">{item.username}</p>
             <p className="font-weight-light m-0">
               {item?.latestMessage
@@ -75,7 +78,7 @@ export default function Users() {
   }
 
   return (
-    <Col xs={4} className="p-0 bg-secondary">
+    <Col xs={2} md={4} className="p-0 bg-secondary">
       {usersMarkup}
     </Col>
   );
