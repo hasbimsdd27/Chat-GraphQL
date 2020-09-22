@@ -1,4 +1,4 @@
-const { User } = require("../../models");
+const { User, Message } = require("../../models");
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
@@ -12,9 +12,26 @@ module.exports = {
           throw new AuthenticationError("Unauthenticated");
         }
 
-        const users = await User.findAll({
+        let users = await User.findAll({
+          attributes: ["username", "imageUrl", "createdAt"],
           where: { username: { [Op.ne]: user.username } },
         });
+
+        const allUserMessages = await Message.findAll({
+          where: {
+            [Op.or]: [{ from: user.username }, { to: user.username }],
+          },
+          order: [["createdAt", "DESC"]],
+        });
+
+        users = users.map((otherUser) => {
+          const latestMessage = allUserMessages.find(
+            (m) => m.from === otherUser.username || m.to === otherUser.username
+          );
+          otherUser.latestMessage = latestMessage;
+          return otherUser;
+        });
+
         return users;
       } catch (error) {
         console.log(error);
@@ -51,7 +68,6 @@ module.exports = {
 
           return {
             ...user.toJSON(),
-            createdAt: user.createdAt.toISOString(),
             token,
           };
         } else {
