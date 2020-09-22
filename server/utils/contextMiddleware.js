@@ -1,11 +1,20 @@
+const { PubSub } = require("apollo-server");
 const jwt = require("jsonwebtoken");
 
+const pubsub = new PubSub();
+
 module.exports = (context) => {
+  let token;
   if (context.req && context.req.headers.authorization) {
-    const token = context.req.headers.authorization.replace("Bearer ", "");
-    jwt.verify(token, process.env.JWT_SECRET_ACCESS, (err, decodedToken) => {
-      context.user = decodedToken;
-    });
+    token = context.req.headers.authorization.replace("Bearer ", "");
+  } else if (context.connection && context.connection.context.Authorization) {
+    token = context.connection.context.Authorization.replace("Bearer ", "");
   }
+
+  jwt.verify(token, process.env.JWT_SECRET_ACCESS, (err, decodedToken) => {
+    context.user = decodedToken;
+  });
+
+  context.pubsub = pubsub;
   return context;
 };
