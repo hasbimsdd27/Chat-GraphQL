@@ -96,6 +96,7 @@ export default function Messages() {
 
   const submitMessage = (e) => {
     e.preventDefault();
+    console.log(selectedUser, content);
     if (content.trim() === "" || !selectedUser) return;
     sendMessage({ variables: { to: selectedUser.username, content } });
     setContent("");
