@@ -1,8 +1,9 @@
 const { User, Message } = require("../../models");
 const { UserInputError, AuthenticationError } = require("apollo-server");
-const argon2 = require("argon2");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
+const saltRounds = 10;
 
 module.exports = {
   Query: {
@@ -57,7 +58,7 @@ module.exports = {
           throw new UserInputError("user not found", { errors });
         }
 
-        if (await argon2.verify(user.password, password)) {
+        if (await bcrypt.compare(password, user.password)) {
           const token = jwt.sign(
             {
               username,
@@ -108,7 +109,7 @@ module.exports = {
         const user = await User.create({
           username,
           email,
-          password: await argon2.hash(password),
+          password: await bcrypt.hash(password, saltRounds),
         });
 
         return user;
